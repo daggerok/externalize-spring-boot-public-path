@@ -1,0 +1,25 @@
+= externalize-spring-boot-public-path
+
+NOTE: see an example in `.travis.yml`
+
+To externalize static resources folder you just need run app wit hproper application / system property:
+
+== customize static resources locations:
+
+.by default spring is using this configuration:
+[sourse,properties]
+----
+spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+----
+
+.so you can replace `classpath:/static/,classpath:/public/` path with yours, like: `/path/to/my-website`:
+[sourse,properties]
+----
+spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,/absolute/path/to/my-website/
+----
+
+.if you wont hard-code absolute path, you can specify custom value on application run. you also can override by using `$(pwd)/my-website/` first otherwise look at `classpath:/static/,classpath:/public/` by chaining them in right order:
+[sourse,bash]
+----
+java -jar target/*.jar --spring.resources.static-locations=$(pwd)/my-website/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+----

@@ -1,0 +1,33 @@
+language: java
+jdk: oraclejdk8
+
+install: true
+before_instal:
+- sudo apt -y update >/dev/null 2>&1 || true
+- sudo apt install -y --no-install-recommends bash curl tar >/dev/null 2>&1
+- source <(curl -s https://raw.githubusercontent.com/daggerok/bash-functions/master/main.bash)
+- stop_any 8080 80
+
+script:
+
+- |
+  curl https://start.spring.io/starter.zip \
+    -d dependencies=web \
+    -d type=gradle-project \
+    -d baseDir=my-backend-project | tar -xzvf -
+- bash ./my-backend-project/gradlew -b ./my-backend-project/build.gradle build
+
+- java -jar ./my-backend-project/build/libs/*.jar &
+- wit_for 8080
+- curl localhost:8080 || true
+- echo "result = '$?'. Does it non zero?"
+- stop_any 8080 80
+
+- mkdir -p my-website
+- echo "<html><body>Hello!</body></html>" ./my-website/index.html
+
+- java -jar ./my-backend-project/build/libs/*.jar --spring.resources.static-locations=$(pwd)/my-website/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/ &
+- wit_for 8080
+- curl localhost:8080
+- echo "result = '$?'. Does it zero?"
+- stop_any 8080 80
