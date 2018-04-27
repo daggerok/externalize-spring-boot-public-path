@@ -1,25 +1,91 @@
-= externalize-spring-boot-public-path
+= externalize-spring-boot-public-path image:https://travis-ci.org/daggerok/externalize-spring-boot-public-path.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/externalize-spring-boot-public-path"]
 
 NOTE: see an example in `.travis.yml`
 
-To externalize static resources folder you just need run app wit hproper application / system property:
+To externalize static resources folder you can run app without public folder packaged
+and later create such folder with needed content near to jar file
 
 == customize static resources locations:
 
-.by default spring is using this configuration:
+.by default spring is using folders `static/` and `public/`:
 [sourse,properties]
 ----
 spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
 ----
 
-.so you can replace `classpath:/static/,classpath:/public/` path with yours, like: `/path/to/my-website`:
+.so you can create near application jar file needed one:
 [sourse,properties]
 ----
-spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,/absolute/path/to/my-website/
+mkdir -p demo
+cd demo/
+curl https://start.spring.io/starter.zip -d dependencies=web | tar -xzvf -
+bash ./mvnw clean package
+cd target/
+mkdir -p public
+echo "<html><body>Hello</body></html>" > ./public/index.html
+java -jar *.jar
+http :8080
+
+tree .
+.
+├── demo-0.0.1-SNAPSHOT.jar
+├── public
+│   └── index.html
+# ...
 ----
 
-.if you wont hard-code absolute path, you can specify custom value on application run. you also can override by using `$(pwd)/my-website/` first otherwise look at `classpath:/static/,classpath:/public/` by chaining them in right order:
+.or create public folder where you are relatively to jar file:
+[sourse,properties]
+----
+mkdir -p demo
+cd demo/
+curl https://start.spring.io/starter.zip -d dependencies=web | tar -xzvf -
+bash ./mvnw clean package
+mkdir -p public
+echo "<html><body>Hello</body></html>" > ./public/index.html
+java -jar ./target/*.jar
+http :8080
+
+tree .
+.
+├── public
+│   └── index.html
+└── target
+    ├── demo-0.0.1-SNAPSHOT.jar
+# ...
+----
+
+.or simply use spring boot executable launch scripts:
 [sourse,bash]
 ----
-java -jar target/*.jar --spring.resources.static-locations=$(pwd)/my-website/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+wget https://start.spring.io/starter.zip -O /tmp/gradle-demo.zip --post-data="dependencies=web"
+mkdir -p /tmp/gradle-demo
+unzip /tmp/gradle-demo.zip -d /tmp/gradle-demo
+cd /tmp/gradle-demo/
+echo 'bootJar { launchScript() }' >> build.gradle
+bash gradlew build
+bash ./build/libs/*.jar &
+http :8080 || true
+mkdir -p ./build/libs/public
+echo "<html><body>Hello</body></html>" > ./build/libs/public/index.html
+http :8080
+
+tree .
 ----
+
+.for maven pom.xml
+[sourse,bash]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <executable>true</executable>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
+

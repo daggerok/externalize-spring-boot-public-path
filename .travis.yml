@@ -2,32 +2,65 @@ language: java
 jdk: oraclejdk8
 
 install: true
-before_instal:
+before_install:
 - sudo apt -y update >/dev/null 2>&1 || true
-- sudo apt install -y --no-install-recommends bash curl tar >/dev/null 2>&1
+- sudo apt install -y --no-install-recommends curl wget unzip bash python-pip >/dev/null 2>&1
+- sudo pip install httpie >/dev/null 2>&1
 - source <(curl -s https://raw.githubusercontent.com/daggerok/bash-functions/master/main.bash)
-- stop_any 8080 80
+- stop_any 80 8080
 
 script:
 
+## working on mac but not on travis linux
+#- |
+#  curl https://start.spring.io/starter.zip \
+#    -d dependencies=web \
+#    -d type=gradle-project \
+#    -d baseDir=my-backend-project | tar -xzvf -
+
+# gradle bash launch script
 - |
-  curl https://start.spring.io/starter.zip \
-    -d dependencies=web \
-    -d type=gradle-project \
-    -d baseDir=my-backend-project | tar -xzvf -
-- bash ./my-backend-project/gradlew -b ./my-backend-project/build.gradle build
+  wget https://start.spring.io/starter.zip -O my-backend-project.zip \
+    --post-data="dependencies=web&type=gradle-project&baseDir=my-backend-project"
 
-- java -jar ./my-backend-project/build/libs/*.jar &
-- wit_for 8080
-- curl localhost:8080 || true
-- echo "result = '$?'. Does it non zero?"
-- stop_any 8080 80
+- unzip -q ./my-backend-project.zip
+- echo "bootJar { launchScript() }" >> ./my-backend-project/build.gradle
+- bash ./my-backend-project/gradlew -b ./my-backend-project/build.gradle build >/dev/null
+- bash ./my-backend-project/build/libs/*.jar &
+- wait_for 8080
+- http :8080
+- stop_any 80 8080
 
-- mkdir -p my-website
-- echo "<html><body>Hello!</body></html>" ./my-website/index.html
+- mkdir -p ./my-backend-project/build/libs/public
+- echo "<html><body>Hello</body></html>" > ./my-backend-project/build/libs/public/index.html
+- bash ./my-backend-project/build/libs/*.jar &
+- wait_for 8080
+- http :8080
+- stop_any 80 8080
 
-- java -jar ./my-backend-project/build/libs/*.jar --spring.resources.static-locations=$(pwd)/my-website/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/ &
-- wit_for 8080
-- curl localhost:8080
-- echo "result = '$?'. Does it zero?"
-- stop_any 8080 80
+# maven java -jar
+- mkdir -p /tmp/demo
+- wget https://start.spring.io/starter.zip -O /tmp/demo.zip --post-data="dependencies=web"
+- unzip -q /tmp/demo.zip -d /tmp/demo
+- cd /tmp/demo/
+- bash ./mvnw clean package >/dev/null
+- cd target/
+- java -jar *.jar &
+- wait_for 8080
+- http :8080
+- stop_any 80 8080
+
+- mkdir -p public
+- echo "<html><body>Hello</body></html>" > ./public/index.html
+- java -jar *.jar &
+- wait_for 8080
+- http :8080
+- stop_any 80 8080
+
+# maven different classpath
+- mv ./public ../
+- cd ..
+- java -jar target/*.jar &
+- wait_for 8080
+- http :8080
+- stop_any 8080
