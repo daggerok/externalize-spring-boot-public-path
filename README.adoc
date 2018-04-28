@@ -30,8 +30,7 @@ tree .
 .
 ├── demo-0.0.1-SNAPSHOT.jar
 ├── public
-│   └── index.html
-# ...
+    └── index.html
 ----
 
 .or create public folder where you are relatively to jar file:
@@ -51,8 +50,7 @@ tree .
 ├── public
 │   └── index.html
 └── target
-    ├── demo-0.0.1-SNAPSHOT.jar
-# ...
+    └── demo-0.0.1-SNAPSHOT.jar
 ----
 
 .or simply use spring boot executable launch scripts:
@@ -74,12 +72,11 @@ http :8080
 
 tree .
 .
-├── build
-│   ├── libs
-│   │   ├── demo-0.0.1-SNAPSHOT.jar
-│   │   └── public
-│   │       └── index.html
-# ...
+└── build
+    └── libs
+        ├── demo-0.0.1-SNAPSHOT.jar
+        └── public
+            └── index.html
 ----
 
 .for maven pom.xml
