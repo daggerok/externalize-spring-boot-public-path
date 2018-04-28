@@ -29,7 +29,7 @@ http :8080
 tree .
 .
 ├── demo-0.0.1-SNAPSHOT.jar
-├── public
+└── public
     └── index.html
 ----
 
