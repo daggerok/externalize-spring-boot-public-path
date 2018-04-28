@@ -79,6 +79,7 @@ tree .
 │   │   ├── demo-0.0.1-SNAPSHOT.jar
 │   │   └── public
 │   │       └── index.html
+# ...
 ----
 
 .for maven pom.xml
