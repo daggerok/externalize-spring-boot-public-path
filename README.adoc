@@ -58,19 +58,27 @@ tree .
 .or simply use spring boot executable launch scripts:
 [sourse,bash]
 ----
-wget https://start.spring.io/starter.zip -O /tmp/gradle-demo.zip --post-data="dependencies=web"
+wget https://start.spring.io/starter.zip -O /tmp/gradle-demo.zip --post-data="dependencies=web&type=gradle-project"
 mkdir -p /tmp/gradle-demo
 unzip /tmp/gradle-demo.zip -d /tmp/gradle-demo
 cd /tmp/gradle-demo/
 echo 'bootJar { launchScript() }' >> build.gradle
 bash gradlew build
-bash ./build/libs/*.jar &
+bash ./build/libs/*.jar
 http :8080 || true
+
 mkdir -p ./build/libs/public
 echo "<html><body>Hello</body></html>" > ./build/libs/public/index.html
+bash ./build/libs/*.jar
 http :8080
 
 tree .
+.
+├── build
+│   ├── libs
+│   │   ├── demo-0.0.1-SNAPSHOT.jar
+│   │   └── public
+│   │       └── index.html
 ----
 
 .for maven pom.xml
