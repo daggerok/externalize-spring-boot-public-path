@@ -13,7 +13,7 @@ and later create such folder with needed content near to jar file
 spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
 ----
 
-.so you can create near application jar file needed one:
+.so you cd to application jar file folder and can create here needed one:
 [sourse,properties]
 ----
 mkdir -p demo
@@ -33,7 +33,7 @@ tree .
     └── index.html
 ----
 
-.or create public folder where you are relatively to jar file:
+.or create public folder where you are relatively to jar file (public folder located in `$PWD`):
 [sourse,properties]
 ----
 mkdir -p demo
@@ -53,7 +53,7 @@ tree .
     └── demo-0.0.1-SNAPSHOT.jar
 ----
 
-.or simply use spring boot executable launch scripts:
+.or simply use spring boot executable launch scripts (public folder located near jar-file):
 [sourse,bash]
 ----
 wget https://start.spring.io/starter.zip -O /tmp/gradle-demo.zip --post-data="dependencies=web&type=gradle-project"
